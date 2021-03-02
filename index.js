@@ -54,15 +54,14 @@ class automaticUpdates {
         }
         switch (this.source) {
             case 'npm':
-                this.updateFromnpm();
+                return this.updateFromnpm();
                 break;
             case 'github':
-                this.updateFromGithub();
+                return this.updateFromGithub();
                 break;
             default:
                 throw Error(`Unrecognized source ${this.source}`)
         }
-        console.log('passed the stage...')
         return true;
     }
 
@@ -71,6 +70,7 @@ class automaticUpdates {
      */
     async updateFromGithub() {
         return new Promise((resolve, reject) => {
+            resolve(true)
             let packageJsonDir = conf.packageJsonDir();
             let remoteExists = shell.exec(`cd ${packageJsonDir} && git remote -v`, { silent: true })
             if (remoteExists.stdout.length === 0 && remoteExists.stderr.length === 0) {
@@ -107,6 +107,7 @@ class automaticUpdates {
      */
     async updateFromnpm() {
         return new Promise((resolve, reject) => {
+            resolve(true)
             const updateFromnpm = async () => {
                 let packageJson = conf.packageJson();
                 let installedVersion = conf.packageJson().version
