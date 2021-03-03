@@ -3,12 +3,14 @@
  */
 const shell = require('shelljs')
 const conf = require('node-etc');
+const events = require('events');
+// const eventEmitter = new events.EventEmitter();
 
 /**
  * Automatic Updates
  */
 
-class automaticUpdates {
+class automaticUpdates extends events{
     /**
      * Update Interval
      */
@@ -24,7 +26,9 @@ class automaticUpdates {
      */
     intervals = null
 
-    constructor() { }
+    constructor() { 
+        super()
+    }
 
     /**
      * clear update intervals
@@ -45,6 +49,12 @@ class automaticUpdates {
         options = Object.assign({ interval: 3600, source: 'npm', test: false }, options);
         this.interval = options.interval
         this.source = options.source
+        // this.on('updated', restartFunc);
+        console.log('````````````````````````````')
+        console.log('````````````````````````````')
+        // console.log(restartFunc)
+        console.log('````````````````````````````')
+        console.log('````````````````````````````')
 
         if (typeof this.interval !== 'number') throw Error(`Invalid interval type for ${this.interval}`)
         if (this.interval <= 0) throw Error(`Interval should be greater than 0`)
@@ -53,17 +63,19 @@ class automaticUpdates {
         }
         switch (this.source) {
             case 'npm':
-                if (!options.test)
-                    return this.updateFromnpm();
+                if (!options.test){
+                    this.updateFromnpm();
+                }
                 break;
             case 'github':
-                if (!options.test)
-                    return this.updateFromGithub();
+                if (!options.test){
+                    this.updateFromGithub();
+                }
                 break;
             default:
                 throw Error(`Unrecognized source ${this.source}`)
         }
-        return true;
+        return this;
     }
 
     /** 
@@ -89,9 +101,10 @@ class automaticUpdates {
                 }
                 let update = shell.exec(`cd ${packageJsonDir}  && GIT_SSH_COMMAND='ssh -i ${key} -o IdentitiesOnly=yes' git pull origin master`)
                 // update = update.stdout + update.stderr;
-                // if (!update.includes('Already up-to-date')) {
-                //     shell.exec(`cd ${packageJsonDir}  && yarn install`);
-                // }
+                if (!update.includes('Already up-to-date')) {
+                    // shell.exec(`cd ${packageJsonDir}  && yarn install`);
+                    this.emit('updated', new Date().getTime())
+                }
             }
 
 
@@ -131,6 +144,7 @@ class automaticUpdates {
                     if (parseInt(latestVersion) > parseInt(installedVersion)) {
                         console.log(`Updating from install v${installedVersionDotted} to latest v${latestVersionDotted}`)
                         // shell.exec(`npm install -g ${packageJson.name}`)
+                        this.emit('updated', new Date().getTime())
                     } else {
                         console.log(`Installed v${installedVersionDotted} is the latest.`)
                     }
@@ -143,7 +157,6 @@ class automaticUpdates {
             updateFromnpm();
             this.updateModules()
             this.intervals = setInterval(() => {
-                console.log(this.interval)
                 updateFromnpm();
                 this.updateModules()
             }, this.interval * 1000)
@@ -155,7 +168,13 @@ class automaticUpdates {
      */
     updateModules() {
         let packageJsonDir = conf.packageJsonDir();
-        shell.exec(`cd ${packageJsonDir} && yarn install || npm install`, { silent: false })
+        let update = shell.exec(`cd ${packageJsonDir} && yarn install || npm install`, { silent: true })
+        if (!update.includes('Already up-to-date')) {
+            // shell.exec(`cd ${packageJsonDir}  && yarn install`);
+            this.emit('updated', new Date().getTime())
+        }else{
+            this.emit('not updated', new Date().getTime())
+        }
     }
 }
 
