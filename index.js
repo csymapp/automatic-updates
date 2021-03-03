@@ -2,7 +2,7 @@
  * Automatically update nodejs program from npm/github
  */
 const shell = require('shelljs')
-const conf = require('node-etc');
+const conf = require('../node-etc');
 const events = require('events');
 // const eventEmitter = new events.EventEmitter();
 
@@ -49,12 +49,6 @@ class automaticUpdates extends events{
         options = Object.assign({ interval: 3600, source: 'npm', test: false }, options);
         this.interval = options.interval
         this.source = options.source
-        // this.on('updated', restartFunc);
-        console.log('````````````````````````````')
-        console.log('````````````````````````````')
-        // console.log(restartFunc)
-        console.log('````````````````````````````')
-        console.log('````````````````````````````')
 
         if (typeof this.interval !== 'number') throw Error(`Invalid interval type for ${this.interval}`)
         if (this.interval <= 0) throw Error(`Interval should be greater than 0`)
@@ -169,11 +163,12 @@ class automaticUpdates extends events{
     updateModules() {
         let packageJsonDir = conf.packageJsonDir();
         let update = shell.exec(`cd ${packageJsonDir} && yarn install || npm install`, { silent: true })
+        
         if (!update.includes('Already up-to-date')) {
             // shell.exec(`cd ${packageJsonDir}  && yarn install`);
             this.emit('updated', new Date().getTime())
         }else{
-            this.emit('not updated', new Date().getTime())
+            this.emit('notUpdated', new Date().getTime())
         }
     }
 }

@@ -27,10 +27,12 @@ Project name is the name in `package.json`. The active branch is master. So ensu
 
 ## usage
 
-```node
+```javascript
 const automaticUpdates = require('automatic-updates');
+automaticUpdates.on('updated', ()=>{
+    process.exit() // what to do restart the service in case of an update
+});
 automaticUpdates.init()
-
 ```
 
 ## api
