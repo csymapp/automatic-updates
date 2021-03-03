@@ -11,7 +11,7 @@ describe('init', function () {
     describe('Invalid interval', function () {
         it('should throw error when interval not numeric', function () {
             try{
-                automaticUpdates.init({ interval: '100' })
+                automaticUpdates.init({ interval: '100', test:true })
                 throw Error("failed this one for non-numeric value")
             }catch(error){
                 return true
@@ -19,7 +19,7 @@ describe('init', function () {
         });
         it('should work with numeric intervals', function () {
             try{
-                automaticUpdates.init({ interval: 100 })
+                automaticUpdates.init({ interval: 100, test:true })
                 automaticUpdates.clearIntervals();
                 return true
             }catch(error){
@@ -28,7 +28,7 @@ describe('init', function () {
         });
         it('should throw error when interval < 0', function () {
             try{
-                automaticUpdates.init({ interval: -1 })
+                automaticUpdates.init({ interval: -1, test:true })
                 throw Error("failed this one for interval < 0")
             }catch(error){
                 return true
@@ -36,7 +36,7 @@ describe('init', function () {
         }); 
         it('should throw error when interval = 0', function () {
             try{
-                automaticUpdates.init({ interval: -0 })
+                automaticUpdates.init({ interval: -0, test:true })
                 throw Error("failed this one for interval = 0")
             }catch(error){
                 return true
@@ -44,7 +44,7 @@ describe('init', function () {
         });
         it('should work with interval greater than 0', function () {
             try{
-                automaticUpdates.init({ interval: 1, source:'github' })
+                automaticUpdates.init({ interval: 1, source:'github', test:true })
                 automaticUpdates.clearIntervals();
                 return true
             }catch(error){
@@ -55,7 +55,7 @@ describe('init', function () {
     describe('Invalid source', function () {
         it('should throw error when source is neither npm not github', function () {
             try{
-                automaticUpdates.init({ source: 'source' })
+                automaticUpdates.init({ source: 'source', test:true })
                 throw Error("failed this one for invalid source")
             }catch(error){
                 return true
@@ -63,7 +63,7 @@ describe('init', function () {
         });
         it('should work with npm source', function () {
             try{
-                automaticUpdates.init({ source: 'npm' })
+                automaticUpdates.init({ source: 'npm', test:true })
                 automaticUpdates.clearIntervals();
                 return true
             }catch(error){
@@ -72,7 +72,7 @@ describe('init', function () {
         });
         it('should work with github source', function () {
             try{
-                automaticUpdates.init({ source: 'github' })
+                automaticUpdates.init({ source: 'github', test:true })
                 automaticUpdates.clearIntervals();
                 return true
             }catch(error){

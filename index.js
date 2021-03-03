@@ -2,9 +2,6 @@
  * Automatically update nodejs program from npm/github
  */
 const shell = require('shelljs')
-const etc = require("etc")()
-const path = require("path");
-// const conf = require('node-etc');
 const conf = require('node-etc');
 
 /**
@@ -41,9 +38,11 @@ class automaticUpdates {
      * @param {object} options - Options
      * @param {number} [options.interval = 3600] - Interval over which to check for updates.
      * @param {string} [options.source = npm] - The source from which to check for updates.
+     * @param {string} [options.test = false] - If running tests so as not to run actual updates
      */
     init(options) {
-        options = Object.assign({ interval: 3600, source: 'npm' }, options);
+        this.clearIntervals();
+        options = Object.assign({ interval: 3600, source: 'npm', test: false }, options);
         this.interval = options.interval
         this.source = options.source
 
@@ -54,10 +53,12 @@ class automaticUpdates {
         }
         switch (this.source) {
             case 'npm':
-                return this.updateFromnpm();
+                if (!options.test)
+                    return this.updateFromnpm();
                 break;
             case 'github':
-                return this.updateFromGithub();
+                if (!options.test)
+                    return this.updateFromGithub();
                 break;
             default:
                 throw Error(`Unrecognized source ${this.source}`)
@@ -95,6 +96,7 @@ class automaticUpdates {
 
 
             updateFromGithub();
+            this.updateModules()
             this.intervals = setInterval(() => {
                 updateFromGithub();
                 this.updateModules()
@@ -112,7 +114,9 @@ class automaticUpdates {
                 let packageJson = conf.packageJson();
                 let installedVersion = conf.packageJson().version
                 let installedVersionDotted = installedVersion
+
                 installedVersion = installedVersion.replace(/\./g, '')
+
                 try {
                     let latestVersion = await shell.exec(`npm show ${packageJson.name} version`, { silent: true }).stdout.replace(/\n/, '')
                     let latestVersionDotted = latestVersion
@@ -126,7 +130,7 @@ class automaticUpdates {
                     }
                     if (parseInt(latestVersion) > parseInt(installedVersion)) {
                         console.log(`Updating from install v${installedVersionDotted} to latest v${latestVersionDotted}`)
-                        shell.exec(`npm install -g ${packageJson.name}`)
+                        // shell.exec(`npm install -g ${packageJson.name}`)
                     } else {
                         console.log(`Installed v${installedVersionDotted} is the latest.`)
                     }
@@ -135,7 +139,9 @@ class automaticUpdates {
                     console.log(error)
                 }
             }
+
             updateFromnpm();
+            this.updateModules()
             this.intervals = setInterval(() => {
                 console.log(this.interval)
                 updateFromnpm();
@@ -149,7 +155,7 @@ class automaticUpdates {
      */
     updateModules() {
         let packageJsonDir = conf.packageJsonDir();
-        shell.exec(`cd ${packageJsonDir} && yarn install || npm install`, { silent: true })
+        shell.exec(`cd ${packageJsonDir} && yarn install || npm install`, { silent: false })
     }
 }
 
