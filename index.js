@@ -2,7 +2,7 @@
  * Automatically update nodejs program from npm/github
  */
 const shell = require('shelljs')
-const conf = require('../node-etc');
+const conf = require('node-etc');
 const events = require('events');
 // const eventEmitter = new events.EventEmitter();
 

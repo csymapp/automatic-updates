@@ -1,6 +1,6 @@
 {
   "name": "automatic-updates",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Tools to automatically update nodejs programs installed as modules from npm/github.",
   "main": "index.js",
   "scripts": {
